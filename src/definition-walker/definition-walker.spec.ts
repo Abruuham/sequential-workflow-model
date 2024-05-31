@@ -12,7 +12,8 @@ describe('DefinitionWalker', () => {
 				true: [],
 				false: [falseStep]
 			},
-			properties: {}
+			properties: {},
+			items: []
 		};
 	}
 
@@ -22,7 +23,8 @@ describe('DefinitionWalker', () => {
 			id: 'task' + name,
 			type: 'task' + name,
 			name,
-			properties: {}
+			properties: {},
+			items: []
 		};
 	}
 
@@ -35,7 +37,8 @@ describe('DefinitionWalker', () => {
 		name: 'loop',
 		type: 'loop',
 		properties: {},
-		sequence: [ifBeta]
+		sequence: [ifBeta],
+		items: []
 	} as SequentialStep;
 	const definition = {
 		sequence: [
@@ -164,19 +167,6 @@ describe('DefinitionWalker', () => {
 			expect(count).toEqual(6);
 		});
 
-		it('iterates over sequence', () => {
-			const steps: Step[] = [];
-
-			walker.forEach(loop.sequence, step => {
-				steps.push(step);
-			});
-
-			expect(steps.length).toEqual(3);
-			expect(steps[0]).toBe(ifBeta);
-			expect(steps[1]).toBe(ifAlfa);
-			expect(steps[2]).toBe(taskFoo);
-		});
-
 		it('stops when callback returns false', () => {
 			let count = 0;
 
@@ -188,6 +178,48 @@ describe('DefinitionWalker', () => {
 			});
 
 			expect(count).toEqual(2);
+		});
+	});
+
+	describe('forEachSequence', () => {
+		it('iterates over sequence', () => {
+			const steps: Step[] = [];
+
+			walker.forEachSequence(loop.sequence, step => {
+				steps.push(step);
+			});
+
+			expect(steps.length).toEqual(3);
+			expect(steps[0]).toBe(ifBeta);
+			expect(steps[1]).toBe(ifAlfa);
+			expect(steps[2]).toBe(taskFoo);
+		});
+	});
+
+	describe('forEachChildren', () => {
+		it('iterates when sequential step is passed', () => {
+			const steps: Step[] = [];
+
+			walker.forEachChildren(loop, step => {
+				steps.push(step);
+			});
+
+			expect(steps.length).toEqual(3);
+			expect(steps[0]).toBe(ifBeta);
+			expect(steps[1]).toBe(ifAlfa);
+			expect(steps[2]).toBe(taskFoo);
+		});
+
+		it('iterates when branched step is passed', () => {
+			const steps: Step[] = [];
+
+			walker.forEachChildren(ifBeta, step => {
+				steps.push(step);
+			});
+
+			expect(steps.length).toEqual(2);
+			expect(steps[0]).toBe(ifAlfa);
+			expect(steps[1]).toBe(taskFoo);
 		});
 	});
 });
