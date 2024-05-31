@@ -1,5 +1,5 @@
 {
-	"name": "sequential-workflow-model",
+	"name": "@abruuham/sequential-workflow-model",
 	"description": "Extendable data model of sequential workflow.",
 	"version": "0.2.0",
 	"homepage": "https://nocode-js.com/",
